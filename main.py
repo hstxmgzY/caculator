@@ -12,51 +12,66 @@ def judge_leg(string):
     # 括号配对
     mystack = Stack()
     for c in string:
-        if c == '(':
-            mystack.push('(')
-        if c == ')':
-            if mystack.is_empty():
+        if c == '(':    #如果有左括号
+            mystack.push('(')   #把它压入栈
+        if c == ')':    #如果是右括号
+            if mystack.is_empty():  #如果栈是空的，说明括号不匹配，返回0
                 return 0
             else:
-                mystack.pop()
-    if not mystack.is_empty():
+                mystack.pop()   #弹出前面的'('
+    if not mystack.is_empty():  #如果结束了里面还有括号，括号不匹配，返回0
         return 0
-
-    # 将表达式分离数字以及符号,并判断表达式的合理性
     list_all = []
-    list_op = ['+', '-', '*', '/', '(', ')', '~']
+    list_op = ['+', '-', '*', '/', '(', ')']
     for i in string:
         list_all.append(i)
 
-    # i = 0
-    # while i <= len(list_all) - 1:
-    #     if list_all[i] not in list_op and i != len(list_all) - 1 and list_all[i + 1] not in list_op:
-    #         list_all[i] = list_all[i] + list_all[i + 1]
-    #         del list_all[i + 1]
-    #         i = i - 1
-    #     i = i + 1
-    #
-    # op = 0
-    # num = 0
-    #
-    # for i in range(len(list_all)):
-    #     if list_all[i] == '(' and i != 0:  # 左括号的右边是操作符，左边是数字
-    #         if list_all[i - 1] not in list_op or list_all[i + 1] in list_op:
-    #             return 0
-    #     if list_all[i] == ')' and i != len(list_all) - 1:  # 右括号的右边是数字，左边是操作符
-    #         if list_all[i - 1] in list_op or list_all[i + 1] not in list_op:
-    #             return 0
-    #     if list_all[i] in list_op and list_all[i + 1] in list_op and i != len(list_all) - 1:
-    #         return 0
-    #     if list_all[i] != ')' and list_all[i] != '(' and list_all[i] in list_op:
-    #         op = op + 1
-    #     if list_all[i] not in list_op:
-    #         num = num + 1
-    # if num != op + 1:
-    #     return 0
+    i = 0
+    while i <= len(list_all) - 1:
+        if list_all[i] not in list_op and i != len(list_all) - 1 and list_all[i + 1] not in list_op:
+            list_all[i] = list_all[i] + list_all[i + 1]
+            del list_all[i + 1]
+            i = i - 1
+        i = i + 1
 
+    op = 0
+    num = 0
+
+    for i in range(len(list_all)):
+        if list_all[i] == '(' and i != 0:  # 左括号的右边是操作符，左边是数字
+            if list_all[i - 1] not in list_op or list_all[i + 1] in list_op:
+                return 0
+        if list_all[i] == ')' and i != len(list_all) - 1:  # 右括号的右边是数字，左边是操作符
+            if list_all[i - 1] in list_op or list_all[i + 1] not in list_op:
+                return 0
+    # 将表达式分离数字以及符号,并判断表达式的合理性
+    list_all = []
+    list_op = ['+', '-', '*', '/', '(', ')']
+    for i in string:
+        list_all.append(i)
+    list_op2 = ['+', '-', '*', '/']
+    i = 0
+    while i <= len(list_all) - 1:   #把数字合并
+        if list_all[i] not in list_op and i != len(list_all) - 1 and list_all[i + 1] not in list_op:
+            list_all[i] = list_all[i] + list_all[i + 1]
+            del list_all[i + 1]
+            i = i - 1
+        i = i + 1
+    for i in range(len(list_all)):  #判断表达式是否非法
+        if list_all[i] == '(' and i != 0:   #如果list_all[i]为左括号且i不等于0的时候（注意：因为前面已经判断了括号是匹配的，所以最后一个元素不可能为左括号，所以不需要有这个条件。
+            if list_all[i-1] not in list_op or list_all[i+1] in list_op:    #如果左括号的前面的元素为数字或者后面的数为符号，那就是非法的
+                return 0
+        if list_all[i] == ')' and i != len(list_all) - 1:   #如果list_all[i]为右括号且i不为最后一个元素的时候（注意：因为前面已经判断了括号是匹配的，所以第一个元素不可能为右括号，所以不需要有这个条件。
+            if list_all[i - 1] in list_op and list_all[i+1] not in list_op:     #如果右括号的前面的元素为符号 或者后面的数为数字，那就是非法的
+                return 0
+        if list_all[i] in list_op2 and list_all[i + 1] in list_op2 and i != len(list_all) - 1:  #如果有连续的两个+-/*，也是非法的
+            return 0
+        if list_all[0] == '/' or list_all[0] == '*' or list_all[len(list_all)-1] in list_op2:    #如果第一个元素为/或*，也是非法的
+            return 0
     return list_all
 
+def judeg_div0():
+    return True
 
 def caltrans(a, b, op):
     a = float(a)
@@ -77,6 +92,8 @@ def caltrans(a, b, op):
             res = int(res)
         return res
     if op == '/':
+        if b == 0:
+            return judeg_div0()
         res = a / b
         if res.is_integer():
             res = int(res)
@@ -87,6 +104,7 @@ def to_postfix(list_all):
     list_op = ['+', '-', '*', '/', '(', ')']
     dict_order = {'+': 1, '-': 1, '*': 2, '/': 2, '(': 0}
     list_res = []
+    list_res.append('0')
     mystack = Stack()
     for i in list_all:
         if i not in list_op:
@@ -99,15 +117,6 @@ def to_postfix(list_all):
                     list_res.append(mystack.top())
                     mystack.pop()
                 mystack.pop()
-            elif i == '~':
-                # 处理负号
-                j = list_all.index(i)
-                if j == 0 or list_all[j - 1] in list_op:
-                    # 表示负数
-                    neg_num = '-' + list_all[j + 1]
-                    list_res.append(neg_num)
-                else:
-                    mystack.push(i)
             else:
                 if mystack.is_empty():
                     mystack.push(i)
@@ -180,10 +189,8 @@ class MyWindow(QWidget, Ui_Dialog):
         self.exit.clicked.connect(self.click_button)
 
     def add_to_display(self, value):
-        if self.display.toPlainText() == '0' and '0' <= value <= '9':
+        if self.display.toPlainText() == '0':
             self.display.clear()
-        #if self.display.toPlainText()[0] in ['+', '-', '*', '/']:
-         #   self.content(self.click_error())
         self.display.insertPlainText(value)
 
     def delete_display(self):
@@ -200,6 +207,8 @@ class MyWindow(QWidget, Ui_Dialog):
         string = self.display.toPlainText()
         if judge_leg(string) == 0:
             self.display.setText('Error！')
+        elif judeg_div0():
+            self.display.setText('Error！')
         else:
             self.display.setText(str(cal(to_postfix(judge_leg(string)))))
         cursor = self.display.textCursor()
@@ -213,8 +222,6 @@ class MyWindow(QWidget, Ui_Dialog):
         if confirm_exit == QMessageBox.StandardButton.Yes:
             QApplication.quit()
 
-    def click_error(self):
-        QMessageBox.question(self, "提示", "第一位数不可以是符号，请重新输入")
 
 
 if __name__ == '__main__':

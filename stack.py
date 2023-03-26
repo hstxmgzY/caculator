@@ -423,7 +423,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        Dialog.setWindowTitle(_translate("Dialog", "计算器"))
         self.add.setText(_translate("Dialog", "➕"))
         self.sub.setText(_translate("Dialog", "➖"))
         self.mul.setText(_translate("Dialog", "X"))
